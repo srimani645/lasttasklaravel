@@ -23,8 +23,14 @@ class HomeController extends Controller
     }
     public function charts()
     {
-
-        return view('home.chart');
+        $month_wise_login_count=DB::table('logindetail')
+        ->selectRaw('email, MONTHNAME(lastlogindate) as Month_Name, COUNT(*) as count')
+        ->groupBy('email', 'Month_Name')
+        ->get();
+        $monthNames = $month_wise_login_count->pluck('Month_Name')->unique()->values()->toArray();
+        $count = $month_wise_login_count->pluck('count')->values()->toArray();
+        // dd($monthNames,$count);
+        return view('home.chart',['monthNames'=>$monthNames,'count'=>$count]);
     }
     public function postcharts()
     {
@@ -41,24 +47,40 @@ class HomeController extends Controller
             'current_password' => ['required','min:8'],
             'password' => ['required','min:8', 'confirmed']
         ]);
+        
+        
 
         $currentPasswordStatus = Hash::check($request->current_password, auth()->user()->password);
-        if($currentPasswordStatus){
-
-            User::findOrFail(Auth::user()->id)->update([
-                'password' => Hash::make($request->password),
-            ]);
-
-            return redirect()->back()->with('message','Password Updated Successfully');
-
-        }else{
-
-            return redirect()->back()->with('message','Current Password does not match with Old Password');
+        if (!$currentPasswordStatus) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current Password does not match with Old Password'
+               
+                ],422);
         }
+        else{
+            User::findOrFail(Auth::user()->id)->update([
+                        'password' => Hash::make($request->password),
+                     ]);
+        
+                    return response()->json([
+                        'success' => true,
+                        'message'=>'Password Updated Successfully']);
+        }
+        // dd(auth()->user()->password,Hash::make($request->current_password));
+        // if($currentPasswordStatus){
+
+        //     
+        //     dd("pwd  updated");
+        // }else{
+
+        //     
+        //     dd("pwd not updated cp!=op");
+        // }
     }
     public function tables()
     {
-             $totalLogins = DB::table('logindetail')->selectRaw('COUNT(id) as Total_Login, email')
+        $totalLogins = DB::table('logindetail')->selectRaw('COUNT(id) as Total_Login, email')
     ->groupBy('email')
     ->get();
 
