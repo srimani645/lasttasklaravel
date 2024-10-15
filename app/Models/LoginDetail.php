@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class LoginDetail extends Model
 {
     use HasFactory;
+    protected $table='logindetail';
     protected $fillable=[
-        'name','email','lastlogindate'
+       'email','lastlogindate'
     ];
 }
