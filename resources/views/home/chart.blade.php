@@ -39,10 +39,10 @@
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['Jan', 'Feb', 'March', 'Apr', 'May', 'June'],
+                        labels: @json($monthNames),
                         datasets: [{
                             label: '# of Visitors',
-                            data: [12, 19, 3, 5, 2, 3],
+                            data: @json($count),
                             borderWidth: 1,
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
                             borderColor: 'rgba(75, 192, 192, 1)',
