@@ -58,7 +58,18 @@ class HomeController extends Controller
     }
     public function tables()
     {
-           return view('home.tables');
+             $totalLogins = DB::table('logindetail')->selectRaw('COUNT(id) as Total_Login, email')
+    ->groupBy('email')
+    ->get();
+
+    $month_wise_login_count=DB::table('logindetail')
+    ->selectRaw('email, MONTHNAME(lastlogindate) as Month_Name, COUNT(*) as count')
+    ->groupBy('email', 'Month_Name')
+    ->get();
+    
+        
+           return view('home.tables',['totalLogins'=>$totalLogins,
+           'month_wise_login_count'=>$month_wise_login_count]);
     }
     public function products()
     {
